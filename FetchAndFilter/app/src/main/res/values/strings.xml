@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FetchAndFilter</string>
+    <string name="item_inventory">Item Inventory</string>
 </resources>
