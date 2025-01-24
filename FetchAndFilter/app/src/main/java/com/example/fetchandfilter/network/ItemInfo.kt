@@ -1,12 +1,16 @@
 package com.example.fetchandfilter.network
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "inventory_table")
 data class ItemInfo(
     @SerializedName("id")
-    val id: Int,
+    @PrimaryKey @ColumnInfo("id") val id: Int,
     @SerializedName("listId")
-    val listId: Int,
+    @ColumnInfo("list_id") val listId: Int,
     @SerializedName("name")
-    val name: String
+    @ColumnInfo("item_name") val name: String
 )

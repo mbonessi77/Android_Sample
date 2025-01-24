@@ -1,21 +1,24 @@
 package com.example.fetchandfilter
 
 import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fetchandfilter.network.FetchNetwork
 import com.example.fetchandfilter.ui.InventoryAdapter
+import com.example.fetchandfilter.ui.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: InventoryAdapter
     private lateinit var rv: RecyclerView
 
-    private val viewModel: MainViewModel by viewModels { MainViewModel.Factory }
+    private val viewModel: MainViewModel by viewModels {
+        MainViewModelFactory(
+            FetchNetwork.fetchService,
+            (application as FetchApplication).db.inventoryDao()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         initUi()
         observeViewModel()
+        viewModel.deleteStaleDb()
         viewModel.getItemList()
     }
 
