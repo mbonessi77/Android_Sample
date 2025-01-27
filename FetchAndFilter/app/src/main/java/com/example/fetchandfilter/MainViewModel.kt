@@ -1,6 +1,5 @@
 package com.example.fetchandfilter
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,6 +16,7 @@ class MainViewModel(private val fetchRepository: FetchRepository) : ViewModel() 
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
 
+    //Launches a coroutine to fetch information from the backend
     fun getItemList() {
         viewModelScope.launch {
             try {
@@ -29,20 +29,25 @@ class MainViewModel(private val fetchRepository: FetchRepository) : ViewModel() 
                     _errorMessage.value = result.message()
                 }
             } catch (e: Exception) {
-                _errorMessage.value = "Error creating local database"
-                Log.d("TAG", "deleteStaleDb: ${e.message}")
+                _errorMessage.value = NETWORK_ERROR_MESSAGE
             }
         }
     }
 
+    //Filters out items with bad data from the original response
+    //Then sorts remaining info by listId followed by item name
     @VisibleForTesting
     internal fun processItemsResponse(list: List<ItemInfo>) {
-        val result = list.filter { item -> !item.name.isNullOrEmpty() }
-        _listItems.value = result.sortedWith(
-            compareBy(
-                { it.listId },
-                { it.name?.removePrefix("Item ")?.toInt() }
+        try {
+            val result = list.filter { item -> !item.name.isNullOrEmpty() }
+            _listItems.value = result.sortedWith(
+                compareBy(
+                    { it.listId },
+                    { it.name?.removePrefix("Item ")?.toInt() }
+                )
             )
-        )
+        } catch (e: Exception) {
+            _errorMessage.value = FILTER_ERROR_MESSAGE
+        }
     }
 }
